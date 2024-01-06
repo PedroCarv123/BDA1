@@ -1,0 +1,23 @@
+db.Competicao.aggregate([
+ {
+        $match: {"Tipo": "first_tier"}
+    },
+    {
+        $group: {
+            _id: {Pais:"$Pais",
+									Competicao:"$Tipo"
+									},
+            mediaIdade: { $avg: "$MediaIdade" }
+        }
+    },
+		
+   {    $sort: {'mediaIdade': 1 }},
+		  { $project: {
+            _id: 0,
+            Pais: "$_id.Pais",	         
+						Liga: "$_id.Competicao",
+            MediaIdade:{  $toInt: "$mediaIdade"}
+            }
+        }
+   
+]);

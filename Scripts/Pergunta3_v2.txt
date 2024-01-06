@@ -1,0 +1,62 @@
+db.Jogos.aggregate([
+    {
+        $match: {
+            'Competicao.Tipo': 'first_tier'
+        }
+    },
+    {
+        $group: {
+            _id: {
+                Epoca: "$Epoca",
+                Nome: "$Competicao.Nome",
+                Tipo: "$Competicao.Tipo",
+                Pais: "$Competicao.Pais"
+            },
+            Golos: {
+                $sum: {
+                    $cond: {
+                        if: {
+                            $eq: ["$Eventos.Tipo", "Goals"]
+                        },
+                        then: 1,
+                        else: 0
+                    }
+                }
+            },
+            Njogos: {
+                $addToSet: "$JogoID"
+            }
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+            Epoca: "$_id.Epoca",
+            Nome: "$_id.Nome",
+            Tipo: "$_id.Tipo",
+            Pais: "$_id.Pais",
+            MediaGolos: {
+                $round: [
+                    {
+                        //$trunc: {
+                            $divide: ["$Golos", { $size: "$Njogos" }]
+                      //  }
+                    },
+                    2
+                ]
+            },
+            Jogos: { $size: "$Njogos" },
+            Golos: "$Golos"
+        }
+    },
+    {
+        $match: {
+            Epoca: {
+                $gte: 2020
+            }
+        }
+    },
+    {
+        $sort: { 'MediaGolos': -1 }
+    }
+])

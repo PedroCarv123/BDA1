@@ -1,0 +1,62 @@
+db.Jogadores.aggregate([
+  
+    {
+        $lookup:{
+            from: "PosicoesJogador",      
+            localField: "PosicaoJogadorID",   
+            foreignField: "ID",
+            as: "Posicao"        
+        }
+    },
+    {   $unwind:"$Posicao" },     
+  
+   		 {
+        $lookup:{
+            from: "Equipas",       
+            localField: "EquipaID",  
+            foreignField: "ID", 
+            as: "EquipaID"        
+        }
+    },
+    {   $unwind:"$EquipaID" },     
+
+	 {
+        $lookup:{
+            from: "Paises",       
+            localField: "PaisID",  
+            foreignField: "ID", 
+            as: "Pais"        
+        }
+    },
+    {   $unwind:"$Pais" },    
+		 {
+        $lookup:{
+            from: "JogadoresAvaliacao",       
+            localField: "ID",  
+            foreignField: "JogadorID", 
+            as: "Aval"        
+        }
+    },
+    {   $unwind:{ path: "$Aval", preserveNullAndEmptyArrays: true}}, 		 		
+  
+    {   
+        $project:{
+            _id : 1, 
+									JogadorID:"$ID",
+									Epoca:"$Epoca",
+									Equipa:"$EquipaID.Nome",		
+									Pais : "$Pais.Descr",								
+									DataNasc: "$DataNasc",
+									MaiorValor:"$MaiorValor",
+									ValorAtual:"$ValorAtual",
+									DataContrato:"$DataContrato",
+									Posicao : "$Posicao.Descr",
+									NomeJogador:"$Nome",
+									Avaliacoes:{Data:"$Aval.DataAvaliacao",
+									Valor:"$Aval.Valor"}						
+						
+        } 
+    },
+			 { $out: {  db: "BDA_Mongo", coll: "Jogadores" }  }
+
+]);

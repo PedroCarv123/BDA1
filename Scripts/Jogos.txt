@@ -1,0 +1,138 @@
+db.Jogos.aggregate([
+  
+    {   $lookup:{
+            from: "RondaJogo",       
+            localField: "RondaID",   
+            foreignField: "ID",
+            as: "Jogo"        
+        }
+    },
+    {   $unwind:"$Jogo" },         
+	{  $lookup:{
+            from: "Arbitros",       
+            localField: "ArbitroID",  
+            foreignField: "ID", 
+            as: "Arbitragem"        
+        }
+    },
+   {   $unwind:{ path: "$Arbitragem", preserveNullAndEmptyArrays: true}}, 		 		
+	{   $lookup:{
+            from: "Treinadores",      
+            localField: "TreinadorCasaID",  
+            foreignField: "ID", 
+            as: "TreinadorCasa"       
+        }
+    },
+    {   $unwind:{ path: "$TreinadorCasa", preserveNullAndEmptyArrays: true}}, 			
+	{   $lookup:{
+            from: "Treinadores",      
+            localField: "TreinadorForaID",  
+            foreignField: "ID", 
+            as: "TreinadorFora"       
+        }
+    },
+ {   $unwind:{ path: "$TreinadorFora", preserveNullAndEmptyArrays: true}}, 				
+	{   $lookup:{
+            from: "Competicoes",      
+            localField: "CompeticaoID",  
+            foreignField: "ID", 
+            as: "Competicao"       
+        }
+    },
+   {   $unwind: "$Competicao"}, 		
+		{   $lookup:{
+            from: "TipoCompeticao",      
+            localField: "Competicao.TipoCompID",  
+            foreignField: "ID", 
+            as: "TipoComptic"       
+        }
+    },
+ {   $unwind:{ path: "$TipoComptic", preserveNullAndEmptyArrays: true}}, 		
+			{   $lookup:{
+            from: "Estadios",      
+            localField: "EstadioID",  
+            foreignField: "ID", 
+            as: "Estadio"       
+        }
+    },
+   {   $unwind:{ path: "$Estadio", preserveNullAndEmptyArrays: true}}, 
+			{   $lookup:{
+            from: "Equipas",      
+            localField: "EquipaCasaID",  
+            foreignField: "ID", 
+            as: "EquipaCasa"       
+        }
+    },
+ {   $unwind:{ path: "$EquipaCasa", preserveNullAndEmptyArrays: true}}, 
+		
+		{   $lookup:{
+            from: "Equipas",      
+            localField: "EquipaForaID",  
+            foreignField: "ID", 
+            as: "EquipaFora"       
+        }
+    },
+ {   $unwind:{ path: "$EquipaFora", preserveNullAndEmptyArrays: true}}, 
+ 
+			{   $lookup:{
+            from: "Paises",      
+            localField: "Competicao.PaisID",  
+            foreignField: "ID", 
+            as: "Pais"       
+        }
+    },
+ {   $unwind:{ path: "$Pais", preserveNullAndEmptyArrays: true}}, 
+ 			{   $lookup:{
+            from: "EventosJogo",      
+            localField: "ID",  
+            foreignField: "JogoID", 
+            as: "Eventos"       
+        }
+    },
+ {   $unwind:{ path: "$Eventos", preserveNullAndEmptyArrays: true}}, 
+ 			{   $lookup:{
+            from: "FichasJogo",      
+            localField: "ID",  
+            foreignField: "JogoID", 
+            as: "Eventos"       
+        }
+    },
+ {   $unwind:{ path: "$Eventos", preserveNullAndEmptyArrays: true}}, 
+    {   $project:{  _id : 1,
+										Epoca :"$Epoca",	
+										Ronda : "$Jogo.Descr",																				    							JogoID: "$JogoID",
+										Data:"$Data",	
+										Arbitro : "$Arbitragem.Nome",
+										Estadio:{Nome:"$Estadio.Nome",
+																Capacidade:"$Estadio.Capacidade"															
+																},
+										Assitencia:"$Assistencia",
+										Treinadores:{ TreinadorCasa:"$TreinadorCasa.Nome",
+																	TreinadorFora:"$TreinadorFora.Nome"
+																},
+										Competicao:{Nome:"$Competicao.Nome",
+																Tipo:"$TipoComptic.Descr",
+																Sigla:"$Competicao.Sigla",
+																Pais:"$Pais.Descr"																		
+																},
+									
+										Equipas:{Casa:"$EquipaCasa.Nome",
+																Fora:"$EquipaFora.Nome"															
+																},
+										Eventos:{Minuto:"$Eventos.Minuto",
+																JogadorID:"$Eventos.JogadorID",
+																Obs:"$Eventos.Obs",
+																JogadorInID:"$Eventos.JogadorInId",
+																JogadorAssitID:"$Eventos.JogadorAssitID"
+														},
+										Fichas:{JogadorID:"$Fichas.JogadorID",
+																EquipaID:"$Fichas.EquipaID",
+																Amarelos:"$Fichas.Amarelos",
+																Vermelho:"$Fichas.Vermelho",
+																Golos:"$Fichas.Golos",
+																Minutos:"$Fichas.Minutos",
+														
+									 }
+    }},
+		 { $out: {  db: "BDA_Futebol", coll: "Jogos" }  }
+]);

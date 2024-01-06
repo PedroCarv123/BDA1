@@ -1,0 +1,43 @@
+db.Jogos.aggregate([
+ //  { $match: {'Competicao.Tipo': 'first_tier' } },
+    {  $lookup: {
+            from: "Jogadores",
+            localField: "Equipas.Casa",
+            foreignField: "Equipa",
+            as: "Jogadores"
+        }    },
+    {  $unwind: "$Jogadores" },
+	
+    {
+        $group: {
+            _id: {
+						    Epoca: "$Epoca",
+                Pais: "$Competicao.Pais",
+                Competicao: "$Competicao.Tipo",
+								Nome:"$Competicao.Nome",
+								Sigla:"$Competicao.Sigla"
+            },
+            mediaIdade: {
+                $avg: {
+                    $floor: { $divide: [ { $subtract: [new Date(), "$Jogadores.DataNasc"] }, 365.25 * 24 * 60 * 60 * 1000 // um ano em milisegundos
+                        ]
+                    }
+                }
+            }
+        }
+    },
+  //  {    $sort: {'mediaIdade': 1 }},
+    { $project: {
+            _id: 0,
+            Pais: "$_id.Pais",
+						Epoca:"$_id.Epoca",
+            Nome: "$_id.Nome",
+						Sigla: "$_id.Sigla",
+						Tipo: "$_id.Competicao",
+            MediaIdade: 
+                "$mediaIdade"
+            
+        }
+    }
+		,		 { $out: {  db: "BDA_Futebol", coll: "Competicao" }  }
+])
