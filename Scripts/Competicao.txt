@@ -26,8 +26,8 @@ db.Jogos.aggregate([
             }
         }
     },
-  //  {    $sort: {'mediaIdade': 1 }},
     { $project: {
+  //  {    $sort: {'mediaIdade': 1 }},
             _id: 0,
             Pais: "$_id.Pais",
 						Epoca:"$_id.Epoca",
@@ -41,3 +41,77 @@ db.Jogos.aggregate([
     }
 		,		 { $out: {  db: "BDA_Futebol", coll: "Competicao" }  }
 ])
+
+
+
+//Criar tabela com numero de jogoe  de golos por competicao
+
+
+db.Jogos.aggregate([
+  // {        $match: {            'Competicao.Tipo': 'first_tier'        }    },
+    {
+        $group: {
+            _id: {
+                Epoca: "$Epoca",
+                Nome: "$Competicao.Nome",
+                Tipo: "$Competicao.Tipo",
+                Pais: "$Competicao.Pais"
+            },
+            Golos: {
+                $sum: {
+                    $cond: {
+                        if: {
+                            $eq: ["$Eventos.Tipo", "Goals"]
+                        },
+                        then: 1,
+                        else: 0
+                    }
+                }
+            },
+            Njogos: {
+                $addToSet: "$JogoID"
+            }
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+            Epoca: "$_id.Epoca",
+            Nome: "$_id.Nome",
+            Tipo: "$_id.Tipo",
+            Pais: "$_id.Pais",
+            MediaGolos: {
+                $round: [
+                    {
+                        //$trunc: {
+                            $divide: ["$Golos", { $size: "$Njogos" }]
+                      //  }
+                    },
+                    2
+                ]
+            },
+            Jogos: { $size: "$Njogos" },
+            Golos: "$Golos"
+        }
+    }
+   // {      //  $match: {            Epoca: {                $gte: 2020            }        }    },
+  //  {        $sort: { 'MediaGolos': -1 }    }
+	,
+			 { $out: {  db: "BDA_Futebol", coll: "MedGolos" }  }
+])
+
+//Carregar o  a mnedia de golos para a colection comepticao
+
+
+db.MedGolos.find().forEach(function(jogo) {
+    var idEpoca = jogo.Epoca;
+    var idTipo = jogo.Tipo;
+		    var idPais = jogo.Pais;
+    var Golos = jogo.MediaGolos;
+
+    db.Competicao.update(
+        { "Epoca": idEpoca ,"Tipo": idTipo ,"Pais": idPais },
+        { $set: { "MediaGolos": Golos } },
+        { multi: true }  
+    );
+});
