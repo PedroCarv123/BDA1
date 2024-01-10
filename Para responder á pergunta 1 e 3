@@ -1,0 +1,17 @@
+---------------------------------------------
+Para responder á pergunta 1 e 3
+ - Nova collection " competicoes" com os campos:  competitionid,descricao,tipocomp,pais
+ 					epoca(aninhado)
+ 						- n med golos
+ 						- idade media jogadores
+
+*Os campos que fazem agregações/medias têm que ser float/decimal*
+
+---------------------------------------------
+Para responder a pergunta 2
+Alterar collection Jogadores para incluir
+	epoca(aninhada)
+		avaliacao
+		n jogos 
+
+---------------------------------------------

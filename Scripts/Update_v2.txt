@@ -1,0 +1,37 @@
+Update:
+Criar tabela de apoio temporraia
+
+db.Jogadores.aggregate([  
+
+ { $match: { "Avaliacoes.Data": {$gte:ISODate("2020-01-01T00:00:00Z")},"Pais": "Portugal" }  } ,
+    
+{ $match: { "Pais": "Portugal" } },	 
+   		
+    {   
+        $project:{
+            _id : 1, 
+									JogadorID:"$JogadorID",		
+									DataAvaliacao:"$DataAvaliacao",
+									Valor:"$Valor",
+									Pais:"$Jogador.Pais"				
+						
+						
+        } 
+    }, { $out: {  db: "BDA_Futebol", coll: "TesteUpdate" }  }
+]);
+
+
+********************************************************************************************************************************************************************
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Update:
+
+db.TesteUpdate.find().forEach(function (avaliacao) {
+    db.Jogadores.update(
+        { _id: avaliacao.JogadorID },
+        {
+            $set: {
+                "Avaliacoes.Valor": avaliacao.Valor * 1.10
+            }
+        }
+    );
+});
