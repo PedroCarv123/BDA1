@@ -3,7 +3,10 @@ SELECT * FROM Jogadores
 SELECT * FROM Equipas
 SELECT * FROM Competicoes
 
+SELECT * FROM Jogadores
 SELECT * FROM AAA_Jogadores
+SELECT * FROM AAA_FichasJogo
+
 SELECT * FROM AAA_Equipas
 
 SELECT Jogadores.ID, Jogadores.Nome, Jogadores.Epoca, Jogadores.EquipaID, Equipas.Nome Equipa, Paises.Descr Pais, Jogadores.DataNasc, Jogadores.MaiorValor, Jogadores.ValorAtual, Jogadores.DataContrato, PosicoesJogador.Descr PosicoesJogador
@@ -42,3 +45,25 @@ INTO AAA_EventosJogo
 FROM EventosJogo, Jogadores, TipoEventoJogo, Equipas, Jogos
 WHERE EventosJogo.JogadorID = Jogadores.ID AND EventosJogo.TipoEventoID = TipoEventoJogo.ID AND EventosJogo.EquipaID = Equipas.ID
 AND EventosJogo.JogoID = Jogos.ID AND Jogos.Epoca >= 2020
+
+
+SELECT * FROM AAA_Jogadores WHERE AAA_Jogadores.Nome LIKE '%DU-RI%'
+
+SELECT * FROM AAA_FichasJogo WHERE AAA_Jogadores.Nome LIKE 'Cristiano Ronaldo'
+WITH TopJogador
+AS
+(	SELECT TOP 100 ID, Nome, ValorAtual
+	FROM Jogadores 
+	WHERE ValorAtual IS NOT NULL 
+	--and Nome like '%LAVIA%'
+	ORDER BY ValorAtual DESC
+)
+SELECT TOP 20 FichasJogo.JogadorID, Jogadores.Nome, Equipas.Nome, CAST(TopJogador.ValorAtual / 1000000 AS VARCHAR(5)) + 'M', COUNT(DISTINCT JogoID) NrJogos 
+FROM Jogadores, FichasJogo, Jogos, Equipas, TopJogador
+WHERE Jogadores.ID = FichasJogo.JogadorID AND Jogadores.EquipaID = Equipas.ID AND TopJogador.ID = FichasJogo.JogadorID 
+--and TopJogador.Nome like '%LAVIA%'
+AND JogoID = Jogos.ID AND DATEDIFF(YEAR, Data, GETDATE()) <= 3
+GROUP BY FichasJogo.JogadorID, Jogadores.Nome, Equipas.Nome, TopJogador.ValorAtual
+ORDER BY NrJogos
+
+SELECT * FROM AAA_Competicoes

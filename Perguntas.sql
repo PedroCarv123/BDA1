@@ -21,6 +21,9 @@ GROUP BY FichasJogo.JogadorID, Jogadores.Nome, Equipas.Nome
 ORDER BY NrJogos
 
 --3 nr medio de golos marcado por tipo de competicao (campeonatos) (desde a epoca 2020/2021)
+SET STATISTICS TIME ON
+GO 
+
 SELECT Epoca, Nome, TipoCompeticao.Descr, Paises.Descr, (SUM(Golos) / COUNT(DISTINCT JogoID)) MediaGolos
 FROM Jogos, FichasJogo, Competicoes, TipoCompeticao, Paises
 WHERE Jogos.ID = JogoID AND CompeticaoID = Competicoes.ID AND TipoCompID = TipoCompeticao.ID
