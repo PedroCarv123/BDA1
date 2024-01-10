@@ -1,0 +1,13 @@
+db.Jogadores.find({"Avaliacoes.Data": {  $gte: ISODate("2025-01-01T00:00:00Z"), $lte: ISODate("2042-12-31T00:00:00Z") }})
+
+
+db.Jogadores.find({"Avaliacoes.Data": {  $gte: ISODate("2021-01-01T00:00:00Z"), $lte: ISODate("2022-12-31T00:00:00Z") }}).forEach(function(Origem) { 
+  var dadosDestino = {
+    "JogadorID": Origem.JogadorID,
+    "Equipa": Origem.Equipa,
+    "Avaliacoes.Data": new Date(Origem.Avaliacoes.Data.getTime() + 10 * 365.25 * 24 * 60 * 60 * 1000),	
+    "Avaliacoes.Valor": Origem.Avaliacoes.Valor
+  };
+ db.Jogadores.insert(dadosDestino);
+
+});

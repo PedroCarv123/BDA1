@@ -641,7 +641,7 @@ db.TesteUpdate.find().forEach(function (avaliacao) {
 ********************************************************************************************************************************************************************
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-~DELETE
+DELETE
 
 
 db.JogadoresAvaliacao.deleteMany({ "DataAvaliacao": {$gte:ISODate("2030-01-02T00:00:00Z") }});
@@ -828,24 +828,44 @@ db.Competicao.aggregate([
 *****************
 
 
+db.Col_Jogos.aggregate([
 
-
-
-//{   $lookup:{
-            from: "FichasJogo",      
-            localField: "ID",  
-            foreignField: "JogoID", 
-            as: "FichasJogo"       
-        }
-    },
-		 {   $unwind:{ path: "$FichasJogo", preserveNullAndEmptyArrays: true}}, 
-,
-	//								 			Fichas:		[	{JogadorID:"$FichasJogo.JogadorID",
-																	EquipaID:"$FichasJogo.EquipaID",
-																	Amarelos:"$FichasJogo.Amarelos",
-																	Vermelhos:"$FichasJogo.Vermelhos",
-																	Golos:"$FichasJogo.Golos",
-																	Assistencias:"$FichasJogo.Assistencias",
-																	Minutos:"$FichasJogo.Minutos"}]
-
+	{   $project:{  _id : 0,
+										JogoID:"$JogoID",
+										Epoca :"$Epoca",	
+										Ronda : "$Ronda",																				    					
+										Arbitro : "$Arbitro",
+										Estadio:{Nome:"$Estadio",
+																Capacidade:"$Capacidade"															
+																},
+										Assitencia:"$Assistencia",
+										Treinadores:{ TreinadorCasa:"$TreinadorCasa",
+																	TreinadorFora:"$TreinadorFora"
+																},
+										Competicao:{Nome:"$Nome",
+																Tipo:"$Tipo",
+																Sigla:"$Sigla",
+																Pais:"$Pais"																		
+																},
+									
+										Equipas:{Casa:"$EquipaCasa",
+																Fora:"$EquipaFora"															
+																},
+										Eventos:{Minuto:"$E_Minuto",
+																JogadorID:"$E_JogadorID",
+																Equipa:"$E_EquipaID",
+																Obs:"$ObsEvento",
+																JogadorInID:"$JogadorInId", 
+																JogadorAssitID:"$JogadorAssitID"
+														},
+										Fichas:{JogadorID:"$JogadorID",
+																EquipaID:"$EquipaID",
+																Amarelos:"$Amarelos",
+																Vermelho:"$Vermelho",
+																Golos:"$Golos",
+																Minutos:"$Minutos",
+														
+									 }}
+    },		 { $out: {  db: "BDA_Futebol", coll: "Jogos" }  }
+]);
 

@@ -13,7 +13,7 @@ AS
 	WHERE ValorAtual IS NOT NULL 
 	ORDER BY ValorAtual DESC
 )
-SELECT TOP 1 FichasJogo.JogadorID, Jogadores.Nome, Equipas.Nome, COUNT(DISTINCT JogoID) NrJogos 
+SELECT TOP 3 FichasJogo.JogadorID, Jogadores.Nome, Equipas.Nome, COUNT(DISTINCT JogoID) NrJogos 
 FROM Jogadores, FichasJogo, Jogos, Equipas, TopJogador
 WHERE Jogadores.ID = FichasJogo.JogadorID AND Jogadores.EquipaID = Equipas.ID AND TopJogador.ID = FichasJogo.JogadorID 
 AND JogoID = Jogos.ID AND DATEDIFF(YEAR, Data, GETDATE()) <= 2

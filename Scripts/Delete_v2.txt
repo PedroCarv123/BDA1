@@ -1,0 +1,10 @@
+
+
+
+db.Jogadores.dropIndexes()
+
+
+
+db.Jogadores.deleteMany({"Avaliacoes.Data": {  $gte: ISODate("2025-01-01T00:00:00Z")}})
+
+
