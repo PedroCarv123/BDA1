@@ -3,11 +3,18 @@ SELECT * FROM Jogadores
 SELECT * FROM Equipas
 SELECT * FROM Competicoes
 
-SELECT * FROM Jogadores
+SELECT * FROM Jogadores WHERE Jogadores.Nome LIKE '%Jota%Silva%'
+SELECT * FROM JogadoresAvaliacao WHERE JogadoresAvaliacao.JogadorID = 663244
+
 SELECT * FROM AAA_Jogadores
 SELECT * FROM AAA_FichasJogo
 
 SELECT * FROM AAA_Equipas
+
+SELECT JogadoresAvaliacao.JogadorID, JogadoresAvaliacao.DataAvaliacao, Equipas.Nome Equipa, JogadoresAvaliacao.Valor, Paises.Descr Pais 
+INTO AAA_JogadoresAvaliacao
+FROM JogadoresAvaliacao, Equipas, Jogadores, Paises
+WHERE JogadoresAvaliacao.EquipaID = Equipas.ID AND JogadoresAvaliacao.JogadorID = Jogadores.ID AND Jogadores.PaisID = Paises.ID
 
 SELECT Jogadores.ID, Jogadores.Nome, Jogadores.Epoca, Jogadores.EquipaID, Equipas.Nome Equipa, Paises.Descr Pais, Jogadores.DataNasc, Jogadores.MaiorValor, Jogadores.ValorAtual, Jogadores.DataContrato, PosicoesJogador.Descr PosicoesJogador
 INTO AAA_Jogadores
